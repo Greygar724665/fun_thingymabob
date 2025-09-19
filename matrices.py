@@ -84,12 +84,12 @@ class Matrix:
         return self*other
     
     def __pow__(self, scalar):
-        resultMatrix=[[0] * self.cols for i in range(self.rows)]
-        for i in range(self.rows):
-            for j in range(self.cols):
-                resultMatrix[i][j]=self.data[i][j]**scalar
-        return Matrix(resultMatrix)
-    
+        i=0
+        matrixCopy=self.duplicate()
+        while i<scalar-1:
+            matrixCopy@=self
+            i+=1
+
     def __matmul__(self,other):
         if self.cols != other.rows:
             raise ValueError("Number of colums of the first matrix have to be equal to the number of rows of the second matrix.")
@@ -127,6 +127,16 @@ class Matrix:
         # elif type=="1norm":
         #     for i in range(self.cols):
     
+    def elementwise_exp(self, exponent):
+        expMatrix=[[0] * self.cols for i in range(self.rows)]
+        for i in range(self.rows):
+            for j in range(self.cols):
+                expMatrix[i][j]=self.data[i][j]**exponent
+        return Matrix(expMatrix)
+    
+    def duplicate(self):
+        return Matrix([row[:] for row in self.data])
+
     def is_square(self):
         if self.rows == self.cols:
             return True
@@ -141,6 +151,7 @@ class Matrix:
         if not self.is_square():
             return False
         return (self@self.transpose() == Matrix.identity(self.rows))
+    
     #endregion Instance Methods
     #region Class Methods
     @classmethod
@@ -159,6 +170,3 @@ class Matrix:
             raw[i][i]=1
         return Matrix(raw)
     #endregion Class Methods
-
-
-
