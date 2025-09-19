@@ -299,4 +299,5 @@ class Matrix:
                 newMatrix[i][j] = randint(min, max)
         return newMatrix
     #endregion Class Methods
+
 help(Matrix)
