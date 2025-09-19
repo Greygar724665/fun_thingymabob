@@ -1,5 +1,5 @@
 from math import sqrt
-
+from random import randint
 class Matrix:
     """
     A class to represent a mathematical matrix and perform matrix operations.
@@ -23,18 +23,20 @@ class Matrix:
     
     def __str__(self):
         """
-        Return a pretty-printed string representation of the matrix.
+        Return a matrix-like string representation using Unicode symbols.
         """
-        # find the max width of each column
-        col_widths = [max(len(str(self.data[r][c])) for r in range(self.rows))
-                      for c in range(self.cols)]
-
-        # build rows with proper spacing
-        rows_str = []
+        col_widths = [max(len(str(self.data[r][c])) for r in range(self.rows)) for c in range(self.cols)]
+        matrix_lines = []
         for r in range(self.rows):
             row_items = [str(self.data[r][c]).rjust(col_widths[c]) for c in range(self.cols)]
-            rows_str.append(" | ".join(row_items))
-        return ("\n".join(rows_str))+f"\n{self.dimensions}\n"
+            line = " ".join(row_items)
+            if r == 0:
+                matrix_lines.append(f"⎡ {line} ⎤")
+            elif r == self.rows - 1:
+                matrix_lines.append(f"⎣ {line} ⎦")
+            else:
+                matrix_lines.append(f"⎥ {line} ⎥")
+        return "\n".join(matrix_lines)
     
     def __eq__(self, other):
         """
@@ -132,7 +134,7 @@ class Matrix:
         """
         if self.cols != other.rows:
             raise ValueError("Number of colums of the first matrix have to be equal to the number of rows of the second matrix.")
-        m_prodMatrix=[[0] * self.rows for i in range(other.cols)]
+        m_prodMatrix=[[0] * other.cols for i in range(self.rows)]
         # return Matrix(m_prodMatrix)
         for row in range(self.rows):
             for col in range(other.cols):
@@ -141,6 +143,36 @@ class Matrix:
                     sum+=self.data[row][k]*other.data[k][col]
                 m_prodMatrix[row][col]=sum
         return Matrix(m_prodMatrix)
+    
+    def __getitem__(self, index):
+        """
+        Get a row of the matrix by index.
+        :param index: Row index.
+        :return: List representing the row at the given index.
+        """
+        return self.data[index]
+    
+    def __setitem__(self, index, value):
+        """
+        Set a row of the matrix by index.
+        :param index: Row index.
+        :param value: List to assign to the row.
+        :raises ValueError: If value is not a list of correct length.
+        """
+        if isinstance(value, list) and len(value) == self.cols:
+            self.data[index] = value
+        else:
+            raise ValueError("Assigned value must be a list with the correct number of columns")
+    
+    def __len__(self):
+        """
+        Return the number of rows in the matrix.
+        :return: Number of rows.
+        """
+        return self.rows
+    
+    def flatten(self):
+        return [elem for row in self.data for elem in row]
     
     def transpose(self):
         """
@@ -238,6 +270,33 @@ class Matrix:
         for i in range(n):
             raw[i][i]=1
         return Matrix(raw)
+    @classmethod
+    def diagonal_matrix(cls, list):
+        """
+        Create a diagonal matrix from a list of values.
+        Each value will be placed on the diagonal, with zeroes elsewhere.
+        :param list: List of values for the diagonal.
+        :return: Matrix with the given diagonal values.
+        """
+        n = len(list)
+        newMatrix = cls.zeroes(n, n)
+        for i in range(n):
+            newMatrix[i][i] = list[i]
+        return newMatrix
+    @classmethod
+    def rnd_matrix(cls, r, c, min=0, max=10):
+        """
+        Create a matrix of size r x c filled with random integers between min and max (inclusive).
+        :param r: Number of rows.
+        :param c: Number of columns.
+        :param min: Minimum random value (inclusive).
+        :param max: Maximum random value (inclusive).
+        :return: Matrix with random integer values.
+        """
+        newMatrix = cls.zeroes(r, c)
+        for i in range(r):
+            for j in range(c):
+                newMatrix[i][j] = randint(min, max)
+        return newMatrix
     #endregion Class Methods
-
-
+help(Matrix)
