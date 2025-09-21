@@ -143,6 +143,7 @@ class Matrix:
         while i<scalar-1:
             matrixCopy@=self
             i+=1
+        return matrixCopy
 
     def __matmul__(self,other):
         # Explanation of the mathematical process:
@@ -337,7 +338,6 @@ class Fractions:
         # Store numerator and denominator
         self.numerator = numerator
         self.denominator = denominator
-        self.eval = self.numerator/self.denominator
         # Explanation: Fractions cannot have complex numbers as numerator or denominator.
         if isinstance(self.numerator, complex) or isinstance(self.denominator, complex):
             raise TypeError("This fractions class does not support complex numbers.")
