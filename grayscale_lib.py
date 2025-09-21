@@ -639,8 +639,3 @@ class Fractions:
     #     if indices:
     #         first_index = min(indices)
     #     first_index
-        
-
-
-
-help(Fractions)
