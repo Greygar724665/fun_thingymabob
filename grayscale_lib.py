@@ -1,5 +1,6 @@
 from math import sqrt, gcd, lcm, floor
 from random import randint
+import sys
 class Matrix:
     #region Magic Methods
     """
@@ -335,6 +336,15 @@ class Fractions:
         :raises TypeError: If numerator or denominator is complex.
         :raises ZeroDivisionError: If denominator is zero.
         """
+        # Handle Fraction inputs first - flatten nested fractions
+        if isinstance(numerator, Fractions):
+            # numerator is a/b, so we want (a/b)/denominator = a/(b*denominator)
+            numerator, denominator = numerator.numerator, numerator.denominator * denominator
+        
+        if isinstance(denominator, Fractions):
+            # We want numerator/(c/d) = numerator*(d/c) = (numerator*d)/c
+            numerator, denominator = numerator * denominator.denominator, denominator.numerator
+        
         # Store numerator and denominator
         self.numerator = numerator
         self.denominator = denominator
@@ -397,6 +407,66 @@ class Fractions:
             other = Fractions(other, 1)
         if isinstance(other, Fractions):
             return self.numerator * other.denominator == other.numerator * self.denominator
+        return False
+
+    def __ne__(self, other):
+        """
+        Check inequality between this fraction and another fraction or integer.
+        :param other: Fractions object or integer.
+        :return: True if not equal, False otherwise.
+        """
+        if isinstance(other, int):
+            other = Fractions(other, 1)
+        if isinstance(other, Fractions):
+            return self.numerator * other.denominator != other.numerator * self.denominator
+        return False
+    
+    def __lt__(self, other):
+        """
+        Check if this fraction is less than another fraction or integer.
+        :param other: Fractions object or integer.
+        :return: True if this fraction is less than other, False otherwise.
+        """
+        if isinstance(other, int):
+            other = Fractions(other, 1)
+        if isinstance(other, Fractions):
+            return self.numerator * other.denominator < other.numerator * self.denominator
+        return False
+
+    def __gt__(self, other):
+        """
+        Check if this fraction is greater than another fraction or integer.
+        :param other: Fractions object or integer.
+        :return: True if this fraction is greater than other, False otherwise.
+        """
+        if isinstance(other, int):
+            other = Fractions(other, 1)
+        if isinstance(other, Fractions):
+            return self.numerator * other.denominator > other.numerator * self.denominator
+        return False
+
+    def __le__(self, other):
+        """
+        Check if this fraction is less than or equal to another fraction or integer.
+        :param other: Fractions object or integer.
+        :return: True if this fraction is less than or equal to other, False otherwise.
+        """
+        if isinstance(other, int):
+            other = Fractions(other, 1)
+        if isinstance(other, Fractions):
+            return self.numerator * other.denominator <= other.numerator * self.denominator
+        return False
+
+    def __ge__(self, other):
+        """
+        Check if this fraction is greater than or equal to another fraction or integer.
+        :param other: Fractions object or integer.
+        :return: True if this fraction is greater than or equal to other, False otherwise.
+        """
+        if isinstance(other, int):
+            other = Fractions(other, 1)
+        if isinstance(other, Fractions):
+            return self.numerator * other.denominator >= other.numerator * self.denominator
         return False
 
     def __add__(self, other):
@@ -548,6 +618,7 @@ class Fractions:
         gtCD = gcd(self.numerator, self.denominator)
         self.numerator //= gtCD
         self.denominator //= gtCD
+        return self
     
     def reciprocal(self):
         """
@@ -639,3 +710,24 @@ class Fractions:
     #     if indices:
     #         first_index = min(indices)
     #     first_index
+
+    @staticmethod
+    def newtonraphson(radicand, iterations, y0_1=False):
+        """
+        Approximate the square root of a number using the Newton-Raphson method.
+        :param radicand: The number to find the square root of.
+        :param iterations: Number of iterations to perform.
+        :param y0_1: If True, start with initial guess of 1; if False, start with closest perfect square.
+        :return: Fractions object representing the approximated square root.
+        """
+        if y0_1 == False:
+            current_approximation = round(sqrt(radicand))
+        else:
+            current_approximation=1
+        # The Newton-Raphson method is for approximating square roots; such an action is unnecessary for perfect squares.
+        if current_approximation == radicand:
+            return sqrt(radicand)
+        
+        for i in range(iterations):
+            current_approximation = Fractions.half() * ( current_approximation + Fractions(radicand, current_approximation))
+        return current_approximation
